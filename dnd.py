@@ -104,38 +104,3 @@ def hook_dropfiles(tkwindow_or_winfoid,func=_func,force_unicode=False):
     ctypes.windll.shell32.DragAcceptFiles(hwnd,True)
     globals()[old] = GetWindowLong(hwnd,GWL_WNDPROC)
     SetWindowLong(hwnd,GWL_WNDPROC,globals()[new])
-
-
-if __name__ == '__main__':
-    def myfunc(ls):
-        def _local_lnk(link):
-            ''' 处理 link 指向的问题。'''
-            import platform
-            if platform.python_version().startswith('3') and type(link) is bytes:
-                try:
-                    _link = link.decode()
-                except:
-                    _link = link.decode('gbk')
-            else:
-                _link = link
-            try:
-                import sys, win32com.client
-                shell = win32com.client.Dispatch("WScript.Shell")
-                shortcut = shell.CreateShortCut(_link)
-                return shortcut.Targetpath if shortcut.Targetpath.strip() else _link
-            except:
-                return _link
-        for i in ls:
-            print('deal link:',_local_lnk(i))
-
-    def test():
-        '''
-        将 windows 桌面的图标拖拽到被挂钩的窗口内
-        对加载到的图标路径进行对应处理的函数。
-        '''
-        import tkinter
-        tk = tkinter.Tk()
-        hook_dropfiles(tk, myfunc)
-        tk.mainloop()
-
-    test()
